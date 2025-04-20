@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Position Size Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    input {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      width: 200px;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    .container {
+      background: #222;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Position Size Calculator</h1>
+    <input id="balance" type="number" placeholder="Account Balance ($)">
+    <input id="risk" type="number" placeholder="Risk % (e.g. 1)">
+    <input id="entry" type="number" placeholder="Entry Price ($)">
+    <input id="stop" type="number" placeholder="Stop-Loss Price ($)">
+    <button onclick="calculate()">Calculate</button>
+    <div class="result" id="output"></div>
+  </div>
+
+  <script>
+    function calculate() {
+      const balance = parseFloat(document.getElementById('balance').value);
+      const riskPercent = parseFloat(document.getElementById('risk').value);
+      const entry = parseFloat(document.getElementById('entry').value);
+      const stop = parseFloat(document.getElementById('stop').value);
+
+      if (!balance || !riskPercent || !entry || !stop || entry === stop) {
+        document.getElementById('output').innerText = 'Please fill all fields correctly.';
+        return;
+      }
+
+      const riskAmount = balance * (riskPercent / 100);
+      const riskPerCoin = Math.abs(entry - stop);
+      const positionSize = riskAmount / riskPerCoin;
+      const positionValue = positionSize * entry;
+
+      document.getElementById('output').innerText = `Position Size: ${positionSize.toFixed(4)} coins\nPosition Value: $${positionValue.toFixed(2)}`;
+    }
+  </script>
+</body>
+</html>
