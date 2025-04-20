@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crypto Position Size Calculator</title>
+  <title>Position Size Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -32,6 +32,7 @@
     .result {
       margin-top: 1rem;
       font-weight: bold;
+      white-space: pre-line;
     }
     .container {
       background: #222;
@@ -46,8 +47,8 @@
     <h1>Position Size Calculator</h1>
     <input id="balance" type="number" placeholder="Account Balance ($)">
     <input id="risk" type="number" placeholder="Risk % (e.g. 1)">
-    <input id="entry" type="number" placeholder="Entry Price ($)">
-    <input id="stop" type="number" placeholder="Stop-Loss Price ($)">
+    <input id="stopPercent" type="number" placeholder="Stop Loss % (e.g. 2)">
+    <input id="leverage" type="number" placeholder="Leverage (e.g. 10)">
     <button onclick="calculate()">Calculate</button>
     <div class="result" id="output"></div>
   </div>
@@ -56,20 +57,23 @@
     function calculate() {
       const balance = parseFloat(document.getElementById('balance').value);
       const riskPercent = parseFloat(document.getElementById('risk').value);
-      const entry = parseFloat(document.getElementById('entry').value);
-      const stop = parseFloat(document.getElementById('stop').value);
+      const stopPercent = parseFloat(document.getElementById('stopPercent').value);
+      const leverage = parseFloat(document.getElementById('leverage').value);
 
-      if (!balance || !riskPercent || !entry || !stop || entry === stop) {
+      if (!balance || !riskPercent || !stopPercent || !leverage || stopPercent === 0 || leverage === 0) {
         document.getElementById('output').innerText = 'Please fill all fields correctly.';
         return;
       }
 
       const riskAmount = balance * (riskPercent / 100);
-      const riskPerCoin = Math.abs(entry - stop);
-      const positionSize = riskAmount / riskPerCoin;
-      const positionValue = positionSize * entry;
+      const positionSize = (riskAmount * 100) / stopPercent;
+      const totalPositionValue = positionSize;
+      const requiredMargin = totalPositionValue / leverage;
 
-      document.getElementById('output').innerText = `Position Size: ${positionSize.toFixed(4)} coins\nPosition Value: $${positionValue.toFixed(2)}`;
+      document.getElementById('output').innerText =
+        `Max Margin to Risk ${riskPercent}%: $${requiredMargin.toFixed(2)}\n` +
+        `Position Size (Value): $${totalPositionValue.toFixed(2)} (with ${leverage}x leverage)\n` +
+        `Loss on Stop Hit: $${riskAmount.toFixed(2)}`;
     }
   </script>
 </body>
